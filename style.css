@@ -1,0 +1,253 @@
+* {
+  box-sizing: border-box;
+}
+
+body {
+  margin: 0;
+  min-height: 100vh;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  background: radial-gradient(circle at 50% 15%, #3a2530 0%, #1d1420 70%);
+  color: #f2e9dc;
+  font-family: "Segoe UI", system-ui, sans-serif;
+}
+
+header {
+  padding: 18px 0 6px;
+  text-align: center;
+}
+
+h1 {
+  margin: 0;
+  font-size: 1.6rem;
+  letter-spacing: 1px;
+}
+
+#status {
+  margin: 6px 0 0;
+  font-size: 1rem;
+  opacity: 0.9;
+  min-height: 1.4em;
+}
+
+.spinner {
+  display: inline-block;
+  width: 0.85em;
+  height: 0.85em;
+  margin-right: 0.45em;
+  border: 2px solid rgba(245, 197, 66, 0.3);
+  border-top-color: #f5c542;
+  border-radius: 50%;
+  vertical-align: -0.1em;
+  animation: spin 0.8s linear infinite;
+}
+
+@keyframes spin {
+  to {
+    transform: rotate(360deg);
+  }
+}
+
+.think-msg {
+  transition: opacity 0.2s ease;
+}
+
+.think-msg.fading {
+  opacity: 0;
+}
+
+#thinkbar {
+  width: min(340px, 78vw);
+  height: 5px;
+  margin: 8px auto 0;
+  border-radius: 3px;
+  background: rgba(245, 197, 66, 0.18);
+  overflow: hidden;
+  opacity: 0;
+  transition: opacity 0.25s ease;
+}
+
+#thinkbar .bar {
+  height: 100%;
+  width: 0;
+  border-radius: 3px;
+  background: linear-gradient(90deg, #f5c542, #ff9a3c);
+}
+
+#thinkbar.loading {
+  opacity: 1;
+}
+
+#thinkbar.loading .bar {
+  width: 100%;
+  transition: width 3s linear;
+}
+
+#board {
+  --sq: min(11vmin, 80px);
+  display: grid;
+  grid-template-columns: repeat(8, var(--sq));
+  grid-template-rows: repeat(8, var(--sq));
+  border: 6px solid #241a26;
+  border-radius: 4px;
+  box-shadow: 0 12px 40px rgba(0, 0, 0, 0.5);
+  user-select: none;
+  touch-action: none;
+}
+
+.square {
+  position: relative;
+}
+
+.square.light {
+  background: #ecd9b0;
+}
+
+.square.dark {
+  background: #a97a5e;
+}
+
+.square:has(.piece.w) {
+  cursor: pointer;
+}
+
+.piece {
+  position: absolute;
+  inset: 0;
+  margin: auto;
+  width: 100%;
+  height: 100%;
+  object-fit: contain;
+  pointer-events: none;
+}
+
+.square.selected {
+  box-shadow: inset 0 0 0 3px #f5c542;
+}
+
+.square.hint::after {
+  content: "";
+  position: absolute;
+  left: 50%;
+  top: 50%;
+  width: 30%;
+  height: 30%;
+  transform: translate(-50%, -50%);
+  border-radius: 50%;
+  background: rgba(30, 20, 10, 0.35);
+}
+
+.square.hint-capture::after {
+  content: "";
+  position: absolute;
+  inset: 4%;
+  border-radius: 50%;
+  border: 4px solid rgba(30, 20, 10, 0.4);
+  box-sizing: border-box;
+}
+
+.square.in-check {
+  background: radial-gradient(circle, rgba(220, 60, 40, 0.85) 0%, rgba(220, 60, 40, 0.25) 75%);
+}
+
+.coord {
+  position: absolute;
+  font-size: 0.55rem;
+  font-weight: 700;
+  opacity: 0.75;
+  pointer-events: none;
+}
+
+.coord.rank {
+  top: 2px;
+  left: 3px;
+}
+
+.coord.file {
+  bottom: 1px;
+  right: 3px;
+}
+
+.square.light .coord {
+  color: #a97a5e;
+}
+
+.square.dark .coord {
+  color: #ecd9b0;
+}
+
+footer {
+  padding: 14px 0 20px;
+  display: flex;
+  justify-content: center;
+  gap: 10px;
+}
+
+#mute {
+  padding: 8px 14px;
+  font-size: 1.05rem;
+  line-height: 1;
+}
+
+button {
+  padding: 8px 18px;
+  font-size: 0.95rem;
+  border: none;
+  border-radius: 6px;
+  background: #f5c542;
+  color: #241a12;
+  font-weight: 600;
+  cursor: pointer;
+}
+
+button:hover {
+  background: #ffd45e;
+}
+
+/* ---------- Drag & drop ---------- */
+
+.piece-ghost {
+  position: fixed;
+  z-index: 1000;
+  pointer-events: none;
+  object-fit: contain;
+  user-select: none;
+  transform: scale(1.1);
+  filter: drop-shadow(0 8px 10px rgba(0, 0, 0, 0.4));
+}
+
+.square.drag-origin .piece {
+  opacity: 0.35;
+}
+
+.square.drop-ok {
+  box-shadow: inset 0 0 0 3px #6ec26a;
+}
+
+.square.drop-bad {
+  box-shadow: inset 0 0 0 3px rgba(220, 60, 40, 0.6);
+}
+
+#board.dragging,
+#board.dragging .square {
+  cursor: grabbing;
+}
+
+/* ---------- Captured piece fade-out ---------- */
+
+.piece-fade {
+  position: fixed;
+  z-index: 1000;
+  pointer-events: none;
+  object-fit: contain;
+}
+
+/* ---------- Checkmate confetti overlay ---------- */
+
+#confetti {
+  position: fixed;
+  inset: 0;
+  z-index: 1001;
+  pointer-events: none;
+}
